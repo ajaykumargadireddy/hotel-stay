@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
 using HotelStay.Domain.ValueObjects;
@@ -61,19 +62,21 @@ public static class HotelEndpoints
         .Produces<IEnumerable<Room>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest);
 
-        // POST /hotels/reserve
         group.MapPost("/reserve", async (
             [FromBody] ReservationRequest request,
             [FromServices] IReservationService service) =>
-        {
+                {
             var reservation = service.Reserve(request);
-            return Results.Ok(reservation);
-        })
-        .WithName("ReserveHotel")
-        .Produces<ReservationResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound)
-        .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
+            return Results.Text(
+                reservation,
+                statusCode: StatusCodes.Status201Created);
+            })
+            .WithName("ReserveHotel")
+            .Produces<ReservationResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
 
         // GET /hotels/reservation/{reference}
         group.MapGet("/reservation/{reference}", async (

@@ -157,30 +157,10 @@ Content-Type: application/json
 }
 ```
 
-**Example Response:** `200 OK`
+**Example Response:** `201 Created`
 
-```json
-{
-  "referenceNumber": "RSV-20260708-ABC123",
-  "roomId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "destination": "Mumbai",
-  "location": "Bandra West",
-  "roomType": "Deluxe",
-  "roomCheckIn": "2026-08-01T00:00:00",
-  "roomCheckOut": "2026-08-05T00:00:00",
-  "checkIn": "2026-08-01T00:00:00",
-  "checkOut": "2026-08-05T00:00:00",
-  "numberOfNights": 4,
-  "totalPrice": 600.00,
-  "currency": "USD",
-  "provider": "PremierStays",
-  "document": {
-    "holderName": "John Doe",
-    "type": "Passport",
-    "number": "AB1234567"
-  },
-  "reservationTimestamp": "2026-07-08 14:30:00"
-}
+```text
+REF-3dde8e7a
 ```
 
 **Error Responses:**

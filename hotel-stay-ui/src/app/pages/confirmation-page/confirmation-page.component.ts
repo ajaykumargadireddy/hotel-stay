@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -19,6 +19,7 @@ export class ConfirmationPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly hotelService = inject(HotelService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   reservation: ReservationResponse | null = null;
   loading = false;
@@ -26,10 +27,12 @@ export class ConfirmationPageComponent implements OnInit {
 
   ngOnInit(): void {
     const stateRes = (this.router.getCurrentNavigation()?.extras.state
-      ?? history.state) as { reservation?: ReservationResponse };
+      ?? history.state) as { reservation?: ReservationResponse | null };
 
     if (stateRes?.reservation) {
       this.reservation = stateRes.reservation;
+      this.loading = false;
+      this.cdr.detectChanges();
       return;
     }
 
@@ -44,12 +47,14 @@ export class ConfirmationPageComponent implements OnInit {
       next: res => {
         this.reservation = res;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
         this.errorMessage = err.status === 404
           ? `Reservation "${reference}" not found.`
           : 'Unable to load reservation.';
+        this.cdr.detectChanges();
       }
     });
   }

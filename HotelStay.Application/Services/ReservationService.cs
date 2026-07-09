@@ -21,7 +21,7 @@ public class ReservationService : IReservationService
         _repository = repository;
     }
 
-    public ReservationResponse Reserve(ReservationRequest request)
+    public string Reserve(ReservationRequest request)
     {
         // 1. Fetch Room by roomId from providers (query all until found)
         var room = _providers
@@ -50,7 +50,7 @@ public class ReservationService : IReservationService
 
         // 4. Persist and return
         _repository.Add(reservation);
-        return ReservationMapper.ToResponse(reservation);
+        return referenceNumber;
     }
 
     public ReservationResponse GetByReference(string referenceNumber)

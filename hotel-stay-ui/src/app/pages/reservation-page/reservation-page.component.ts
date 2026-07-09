@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -20,6 +20,7 @@ export class ReservationPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly hotelService = inject(HotelService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   room: RoomWithDetails | null = null;
   checkIn: string = '';
@@ -48,10 +49,20 @@ export class ReservationPageComponent implements OnInit {
     this.errorMessage = null;
 
     this.hotelService.reserveRoom(request).subscribe({
-      next: (response: ReservationResponse) => {
-        this.submitting = false;
-        this.router.navigate(['/confirmation', response.referenceNumber], {
-          state: { reservation: response }
+      next: (reference: string) => {
+        this.hotelService.getReservation(reference).subscribe({
+          next: (reservation: ReservationResponse) => {
+            this.submitting = false;
+            this.router.navigate(['/confirmation', reference], {
+              state: { reservation }
+            });
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.submitting = false;
+            this.router.navigate(['/confirmation', reference]);
+            this.cdr.detectChanges();
+          }
         });
       },
       error: (err: HttpErrorResponse) => {

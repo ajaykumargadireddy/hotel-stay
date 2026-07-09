@@ -36,8 +36,10 @@ export class HotelService {
       );
   }
 
-  reserveRoom(request: ReservationRequest): Observable<ReservationResponse> {
-    return this.http.post<ReservationResponse>('/hotels/reserve', request);
+  reserveRoom(request: ReservationRequest): Observable<string> {
+    return this.http.post('/hotels/reserve', request, { responseType: 'text' }).pipe(
+      map(reference => reference.replace(/^['"]|['"]$/g, '').trim())
+    );
   }
 
   getReservation(reference: string): Observable<ReservationResponse> {

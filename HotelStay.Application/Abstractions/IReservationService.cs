@@ -4,6 +4,6 @@ namespace HotelStay.Application.Abstractions;
 
 public interface IReservationService
 {
-    ReservationResponse Reserve(ReservationRequest request);
+    string Reserve(ReservationRequest request);
     ReservationResponse GetByReference(string referenceNumber);
 }

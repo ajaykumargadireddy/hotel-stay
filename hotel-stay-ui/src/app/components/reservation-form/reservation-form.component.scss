@@ -1,0 +1,54 @@
+.reservation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem;
+
+  h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.25rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  &__label {
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.9rem;
+  }
+
+  &__input {
+    padding: 0.55rem 0.65rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+
+    &:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 1px;
+      border-color: #3b82f6;
+    }
+  }
+
+  &__hint {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  &__error {
+    font-size: 0.8rem;
+    color: #b91c1c;
+  }
+}

@@ -1,0 +1,66 @@
+.reservation-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @media (min-width: 900px) {
+      grid-template-columns: 320px 1fr;
+    }
+  }
+
+  &__summary {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.25rem;
+
+    h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    p {
+      margin: 0 0 0.5rem;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+
+    .provider {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    .total {
+      font-size: 1.1rem;
+      color: #0f172a;
+    }
+
+    .policy {
+      color: #475569;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+    }
+  }
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}

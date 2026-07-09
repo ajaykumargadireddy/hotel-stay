@@ -1,0 +1,70 @@
+<section class="confirmation" *ngIf="loading">
+  <p>Loading reservation…</p>
+</section>
+
+<section class="confirmation" *ngIf="errorMessage">
+  <div class="alert" role="alert">{{ errorMessage }}</div>
+  <a routerLink="/" class="btn btn--primary">Back to search</a>
+</section>
+
+<section class="confirmation" *ngIf="reservation">
+  <header class="confirmation__header">
+    <span class="check" aria-hidden="true">✓</span>
+    <h1>Booking confirmed</h1>
+    <p class="reference">
+      Reference: <strong>{{ reservation.referenceNumber }}</strong>
+    </p>
+  </header>
+
+  <dl class="confirmation__grid">
+    <div>
+      <dt>Provider</dt>
+      <dd>{{ reservation.provider }}</dd>
+    </div>
+    <div>
+      <dt>Room type</dt>
+      <dd>{{ reservation.roomType | roomType }}</dd>
+    </div>
+    <div>
+      <dt>Destination</dt>
+      <dd>{{ reservation.destination }}<span *ngIf="reservation.location"> — {{ reservation.location }}</span></dd>
+    </div>
+    <div>
+      <dt>Check-in</dt>
+      <dd>{{ reservation.checkIn | date:'mediumDate' }}</dd>
+    </div>
+    <div>
+      <dt>Check-out</dt>
+      <dd>{{ reservation.checkOut | date:'mediumDate' }}</dd>
+    </div>
+    <div>
+      <dt>Nights</dt>
+      <dd>{{ reservation.numberOfNights }}</dd>
+    </div>
+    <div>
+      <dt>Total price</dt>
+      <dd class="total">{{ reservation.totalPrice | currency:reservation.currency }}</dd>
+    </div>
+    <div *ngIf="reservation.cancellationPolicy">
+      <dt>Cancellation policy</dt>
+      <dd>{{ reservation.cancellationPolicy }}</dd>
+    </div>
+  </dl>
+
+  <section class="confirmation__guest">
+    <h2>Guest</h2>
+    <p>{{ reservation.document.holderName }}</p>
+    <p>{{ reservation.document.type | documentType }}: {{ reservation.document.number }}</p>
+  </section>
+
+  <p class="timestamp">Booked on {{ reservation.reservationTimestamp }}</p>
+
+  <div class="confirmation__note">
+    <p>💡 Save your reference number to view your booking details anytime from <a routerLink="/bookings">My Bookings</a>.</p>
+  </div>
+
+  <div class="confirmation__actions">
+    <a routerLink="/" class="btn btn--primary">New search</a>
+    <a routerLink="/bookings" class="btn btn--secondary">My Bookings</a>
+  </div>
+</section>

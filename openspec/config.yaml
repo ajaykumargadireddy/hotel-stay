@@ -1,0 +1,118 @@
+schema: spec-driven
+
+context: |
+  Project: Hotel Stay Availability API for the SkyRoute challenge.
+
+  Stack:
+    Backend:
+      - Runtime: .NET 8 (C#)
+      - API: ASP.NET Core Minimal API
+      - Packages: Swashbuckle.AspNetCore 6.5.0 (OpenAPI/Swagger), Karambolo.Extensions.Logging.File 3.4.0
+      - Architecture: Onion (Domain, Application, Infrastructure, API layers)
+      - Storage: In-memory ConcurrentDictionary (demo purposes)
+    
+    Frontend:
+      - Framework: Angular 20.3.0
+      - Language: TypeScript 5.9.2
+      - Components: Standalone components (no NgModules)
+      - Routing: Lazy-loaded routes
+      - Forms: Reactive forms with custom validators
+      - HTTP: HttpClient with interceptors
+      - State: Service-based state management
+    
+    Testing:
+      - Backend: xUnit 2.5.3, Moq 4.20.70, Coverlet 6.0.0
+      - Frontend: Jasmine 5.9.0, Karma 6.4.0
+    
+    AI Tooling:
+      - GitHub Copilot (IDE-integrated code generation)
+      - OpenSpec CLI (spec-driven workflow)
+    
+    Standards:
+      - Dates: ISO 8601 format (yyyy-MM-dd)
+      - JSON: camelCase (default .NET Minimal API)
+      - Error Responses: RFC 7807 ProblemDetails
+
+  Architecture:
+    - Use full Onion architecture.
+    - HotelStay.Domain has no project references.
+    - HotelStay.Application references Domain.
+    - HotelStay.Infrastructure references Domain and Application.
+    - HotelStay.Api references Application and Infrastructure.
+    - HotelStay.Tests may reference all projects.
+
+  Domain rules:
+    - Keep domain models always valid.
+    - Put reservation invariants in the entity verb method, e.g. Reservation.Reserve(...).
+    - Reservation.Reserve validates the model, validates document rules, sets reservation timestamp, and is the future hook for domain events.
+    - Do not create separate validator classes unless a later change explicitly requires them.
+    - Use DateTime in "yyyy-MM-dd HH:mm:ss" format for all date-time fields (check-in, check-out, reservation timestamp).
+    - RoomType enum: Standard, Deluxe, Suite.
+    - Room has Location (country) field; currency determined by location (e.g., India=INR, UK=GBP, US=USD, Europe=EUR, Japan=JPY).
+    - Document validation: India locations = domestic (accept National ID or Passport); non-India locations = international (require Passport).
+    - Providers maintain a static catalog of rooms with pre-generated GUIDs (deterministic room availability).
+    - Reservation validation: Verify roomId exists in provider catalog; validate document type against location; do not require duplicate fields (destination, dates, room type, provider) that are already part of the Room model.
+
+  Interface placement:
+    - IReservationRepository belongs in Domain.
+    - IHotelProvider belongs in Application with two methods (Search and GetRoomById).
+    - Use Service suffix for use-case orchestration.
+    - Use Provider suffix for external hotel integrations.
+    - Use Repository suffix for persistence.
+
+  Mapping:
+    - Use explicit static mappers in Application layer (one mapper per entity/aggregate).
+    - ReservationMapper handles request → value objects (e.g., Document) and domain → response; service calls Reservation.Reserve factory directly.
+    - Room is the normalized domain model; providers convert JSON → Room; no search mapper needed unless response shape differs significantly.
+    - Application layer DTOs (HotelSearchRequest, ReservationRequest, etc.) define the contract between API and Application; no separate API-layer mappers needed.
+    - Keep endpoints thin (extract HTTP data and call Application DTOs/services directly).
+    - Do not put DTO mapping logic inside domain entities.
+
+  API behavior:
+    - Return ProblemDetails for domain/application errors.
+    - DomainValidationException maps to 400.
+    - DocumentMismatchException maps to 422.
+    - ReservationNotFoundException maps to 404.
+    - Use structured logging and X-Correlation-Id middleware.
+
+  Testing strategy:
+    - Scope tests by layer and avoid retesting lower-layer behavior in higher-layer tests.
+    - Domain tests exercise real domain models and verify domain invariants directly.
+    - Application service tests focus on service orchestration and mock dependencies outside the service boundary, such as repositories and providers.
+    - When a domain behavior must be isolated from application service tests, make the relevant domain method virtual where practical.
+    - Infrastructure tests focus on provider, repository, mapper, and stub behavior.
+    - API tests focus on HTTP contracts, request/response mapping, middleware behavior, and error translation.
+    - Do not mock domain behavior in domain tests.
+
+rules:
+  change-naming:
+    - All change names MUST end with category suffix (-api or -ui).
+    - API changes affect backend, endpoints, services, domain models, or infrastructure.
+    - UI changes affect frontend components, pages, forms, or Angular application.
+    - Examples - add-hotel-availability-api, create-booking-form-ui, update-search-filters-ui.
+    - OpenSpec propose command validates suffix and prompts user if missing.
+    - Root-level spec.md automatically categorizes changes based on suffix.
+
+  proposal:
+    - State scope and non-goals clearly.
+    - Keep skipped production concerns explicit.
+    - Include Future Scope only for meaningful out-of-scope follow-up items.
+    - Include open questions for discussion and decision-making.
+
+  specs:
+    - Write requirements as observable behavior.
+    - Use SHALL for requirements.
+    - Use scenario blocks with GIVEN, WHEN, THEN, and AND.
+    - Cover success and error cases for search, reserve, and reservation lookup.
+
+  design:
+    - Explain dependency direction and interface placement.
+    - Include mapper boundaries.
+    - Include the domain invariant gate, e.g. Reservation.Reserve(...), as the place where reservation validation and timestamping occur.
+    - Avoid production-scope additions unless required by the proposal.
+    - Include open questions for discussion and decision-making.
+
+  tasks:
+    - Group tasks by Domain, Application, Infrastructure, API, Tests, and Documentation.
+    - Include xUnit coverage for domain rules, provider filtering/mapping, service orchestration, and API error mapping.
+    - Keep test tasks scoped by layer: Domain tests use real domain models, Application tests focus on services with dependencies mocked, Infrastructure tests cover providers/repositories/mappers, and API tests cover HTTP contracts and middleware.

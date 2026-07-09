@@ -1,0 +1,30 @@
+<section class="reservation-page" *ngIf="room">
+  <h1>Complete your reservation</h1>
+
+  <div class="reservation-page__layout">
+    <aside class="reservation-page__summary">
+      <h2>Selected room</h2>
+      <p class="provider">{{ room.provider }}</p>
+      <p><strong>{{ room.roomType | roomType }}</strong> — {{ room.destination }}<span *ngIf="room.location"> ({{ room.location }})</span></p>
+      <p><strong>Your stay:</strong> {{ checkIn | date:'mediumDate' }} → {{ checkOut | date:'mediumDate' }}</p>
+      <p>{{ room.numberOfNights }} night{{ room.numberOfNights === 1 ? '' : 's' }}</p>
+      <p class="total">Total: <strong>{{ room.totalPrice | currency:room.currency }}</strong></p>
+      <p class="policy"><strong>Cancellation:</strong> {{ room.cancellationPolicy }}</p>
+    </aside>
+
+    <div class="reservation-page__form">
+      <div class="alert" *ngIf="errorMessage" role="alert">
+        {{ errorMessage }}
+      </div>
+
+      <app-reservation-form
+        [room]="room"
+        [checkIn]="checkIn"
+        [checkOut]="checkOut"
+        [isInternational]="isInternational"
+        [submitting]="submitting"
+        (reserve)="onReserve($event)"
+      ></app-reservation-form>
+    </div>
+  </div>
+</section>

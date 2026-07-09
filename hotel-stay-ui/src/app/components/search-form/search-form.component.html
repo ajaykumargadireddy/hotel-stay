@@ -1,0 +1,60 @@
+<form class="search-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="search-form__grid">
+    <label class="field">
+      <span class="field__label">Country</span>
+      <select formControlName="country" class="field__input">
+        <option value="">Select country</option>
+        <option *ngFor="let c of countries" [value]="c.code">{{ c.name }}</option>
+      </select>
+      <span class="field__error" *ngIf="form.controls.country.touched && form.controls.country.invalid">
+        Please select a country
+      </span>
+    </label>
+
+    <label class="field">
+      <span class="field__label">City</span>
+      <select formControlName="city" class="field__input">
+        <option value="">{{ form.controls.city.disabled ? 'Select country first' : 'Select city' }}</option>
+        <option *ngFor="let c of cities" [value]="c.code">{{ c.name }}</option>
+      </select>
+      <span class="field__error" *ngIf="form.controls.city.touched && form.controls.city.invalid">
+        Please select a city
+      </span>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Check-in</span>
+      <input type="date" formControlName="checkIn" class="field__input" [min]="today" />
+      <span class="field__error" *ngIf="form.controls.checkIn.touched && form.controls.checkIn.hasError('required')">
+        Required
+      </span>
+      <span class="field__error" *ngIf="form.controls.checkIn.hasError('pastDate')">
+        Cannot be in the past
+      </span>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Check-out</span>
+      <input type="date" formControlName="checkOut" class="field__input" [min]="minCheckOut" />
+      <span class="field__error" *ngIf="form.controls.checkOut.touched && form.controls.checkOut.hasError('required')">
+        Required
+      </span>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Room Type</span>
+      <select formControlName="roomType" class="field__input">
+        <option value="">Any</option>
+        <option *ngFor="let t of roomTypes" [value]="t">{{ t }}</option>
+      </select>
+    </label>
+
+    <div class="field field--submit">
+      <button type="submit" class="btn btn--primary" [disabled]="form.invalid">Search Hotels</button>
+    </div>
+  </div>
+
+  <p class="search-form__error" *ngIf="form.errors?.['invalidDateRange'] && form.controls.checkOut.touched">
+    Check-out date must be after check-in date
+  </p>
+</form>

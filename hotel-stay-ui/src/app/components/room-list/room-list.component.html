@@ -1,0 +1,27 @@
+<div class="room-list" *ngIf="loading">
+  <div class="loading" role="status" aria-live="polite">Searching hotels…</div>
+</div>
+
+<div class="room-list" *ngIf="!loading && hasSearched && rooms.length === 0">
+  <div class="empty">
+    <p><strong>No rooms available</strong></p>
+    <p>Try different dates or destination.</p>
+  </div>
+</div>
+
+<div class="room-list" *ngIf="!loading && rooms.length > 0">
+  <header class="room-list__header">
+    <h2>{{ rooms.length }} room{{ rooms.length === 1 ? '' : 's' }} available</h2>
+    <button type="button" class="btn btn--ghost" (click)="toggleSort()">
+      Sort by price: {{ sortOrder === 'asc' ? 'Low to High' : 'High to Low' }}
+    </button>
+  </header>
+
+  <div class="room-list__grid">
+    <app-room-card
+      *ngFor="let room of sortedRooms; trackBy: trackByRoomId"
+      [room]="room"
+      (book)="book.emit($event)"
+    ></app-room-card>
+  </div>
+</div>

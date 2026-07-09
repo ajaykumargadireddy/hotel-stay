@@ -1,0 +1,59 @@
+.app-header {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 0.9rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+
+  &__logo {
+    font-size: 1.4rem;
+  }
+
+  &__nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  &__link {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-weight: 500;
+
+    &:hover {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      color: #60a5fa;
+      background: rgba(96, 165, 250, 0.1);
+    }
+  }
+}
+
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}

@@ -1,0 +1,19 @@
+<section class="search-page">
+  <div class="search-page__intro">
+    <h1>Find your stay</h1>
+    <p>Search rooms across multiple providers.</p>
+  </div>
+
+  <app-search-form (search)="onSearch($event)"></app-search-form>
+
+  <div class="search-page__error" *ngIf="errorMessage" role="alert">
+    {{ errorMessage }}
+  </div>
+
+  <app-room-list
+    [rooms]="rooms"
+    [loading]="loading"
+    [hasSearched]="hasSearched"
+    (book)="onBook($event)"
+  ></app-room-list>
+</section>

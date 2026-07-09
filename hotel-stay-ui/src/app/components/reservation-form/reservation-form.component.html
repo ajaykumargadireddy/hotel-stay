@@ -1,0 +1,37 @@
+<form class="reservation-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <h2>Guest details</h2>
+
+  <label class="field">
+    <span class="field__label">Full name (as on document)</span>
+    <input type="text" formControlName="holderName" class="field__input" autocomplete="name" />
+    <span class="field__error" *ngIf="form.controls.holderName.touched && form.controls.holderName.invalid">
+      Please enter a valid name (min 2 characters)
+    </span>
+  </label>
+
+  <label class="field">
+    <span class="field__label">Document type</span>
+    <select formControlName="documentType" class="field__input">
+      <option *ngFor="let t of allowedDocumentTypes" [value]="t">
+        {{ t | documentType }}
+      </option>
+    </select>
+    <span class="field__hint">
+      {{ isInternational ? 'International destination — Passport required.' : 'Domestic destination — Passport or National ID accepted.' }}
+    </span>
+  </label>
+
+  <label class="field">
+    <span class="field__label">Document number</span>
+    <input type="text" formControlName="documentNumber" class="field__input" autocomplete="off" />
+    <span class="field__error" *ngIf="form.controls.documentNumber.touched && form.controls.documentNumber.invalid">
+      Enter a valid document number (5–20 characters)
+    </span>
+  </label>
+
+  <div class="reservation-form__actions">
+    <button type="submit" class="btn btn--primary" [disabled]="form.invalid || submitting">
+      {{ submitting ? 'Reserving…' : 'Confirm reservation' }}
+    </button>
+  </div>
+</form>

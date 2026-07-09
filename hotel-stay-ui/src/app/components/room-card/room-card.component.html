@@ -1,0 +1,34 @@
+<article class="room-card">
+  <header class="room-card__header">
+    <span class="room-card__provider" [attr.data-provider]="room.provider">{{ room.provider }}</span>
+    <span class="room-card__stars" *ngIf="room.starRating" aria-label="Star rating">
+      <span *ngFor="let s of stars">&#9733;</span>
+    </span>
+  </header>
+
+  <div class="room-card__body">
+    <h3 class="room-card__title">{{ room.roomType | roomType }}</h3>
+    <p class="room-card__location">{{ room.destination }}<span *ngIf="room.location"> — {{ room.location }}</span></p>
+
+    <div class="room-card__pricing">
+      <div class="rate">
+        <span class="label">Per night</span>
+        <span class="value">{{ room.perNightRate | currency:room.currency }}</span>
+      </div>
+      <div class="total">
+        <span class="label">Total ({{ room.numberOfNights }} nights)</span>
+        <span class="value">{{ room.totalPrice | currency:room.currency }}</span>
+      </div>
+    </div>
+
+    <ul class="room-card__amenities" *ngIf="room.amenities?.length">
+      <li *ngFor="let amenity of room.amenities">{{ amenity }}</li>
+    </ul>
+
+    <p class="room-card__policy"><strong>Cancellation:</strong> {{ room.cancellationPolicy }}</p>
+  </div>
+
+  <footer class="room-card__footer">
+    <button type="button" class="btn btn--primary" (click)="onBook()">Book Now</button>
+  </footer>
+</article>

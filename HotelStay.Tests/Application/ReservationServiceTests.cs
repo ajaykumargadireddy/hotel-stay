@@ -145,10 +145,10 @@ public class ReservationServiceTests
         var response = service.Reserve(request);
 
         // Assert
-        Assert.NotNull(response.ReferenceNumber);
-        Assert.StartsWith("REF-", response.ReferenceNumber);
-        Assert.Equal(12, response.ReferenceNumber.Length); // REF- + 8 hex chars
-        Assert.Matches(@"^REF-[a-f0-9]{8}$", response.ReferenceNumber);
+        Assert.NotNull(response);
+        Assert.StartsWith("REF-", response);
+        Assert.Equal(12, response.Length); // REF- + 8 hex chars
+        Assert.Matches(@"^REF-[a-f0-9]{8}$", response);
     }
 
     [Fact]

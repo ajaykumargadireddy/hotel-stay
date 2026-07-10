@@ -191,6 +191,24 @@ See [`openspec/config.yaml`](openspec/config.yaml) for project-specific rules an
 
 ---
 
+# Cheat-sheet quick date lookup
+
+Run this one-liner in PowerShell to print today's concrete stub dates:
+
+```powershell
+$today = (Get-Date).Date
+[pscustomobject]@{
+  India_CheckIn  = $today.AddDays(30).ToString('yyyy-MM-dd')
+  India_CheckOut = $today.AddDays(35).ToString('yyyy-MM-dd')
+  UK_CheckIn     = $today.AddDays(45).ToString('yyyy-MM-dd')
+  UK_CheckOut    = $today.AddDays(50).ToString('yyyy-MM-dd')
+  US_CheckIn     = $today.AddDays(60).ToString('yyyy-MM-dd')
+  US_CheckOut    = $today.AddDays(65).ToString('yyyy-MM-dd')
+  Japan_CheckIn  = $today.AddDays(75).ToString('yyyy-MM-dd')
+  Japan_CheckOut = $today.AddDays(80).ToString('yyyy-MM-dd')
+} | Format-List
+```
+
 ## About spec.md and prompts.md
 
 **Note:** [`spec.md`](spec.md) and [`prompts.md`](prompts.md) serve as **index files** to the OpenSpec structure, as per OpenSpec's design philosophy:

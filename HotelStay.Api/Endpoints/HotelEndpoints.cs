@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
+using HotelStay.Domain.Enums;
 using HotelStay.Domain.ValueObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +23,7 @@ public static class HotelEndpoints
             [FromQuery] string destination,
             [FromQuery] DateTime? checkIn,
             [FromQuery] DateTime? checkOut,
-            [FromQuery] string? roomType,
+            [FromQuery] RoomType? roomType,
             [FromServices] IHotelSearchService service) =>
         {
             // Validate required parameters
@@ -52,7 +53,7 @@ public static class HotelEndpoints
                 Destination = destination,
                 CheckIn = checkIn.Value,
                 CheckOut = checkOut.Value,
-                RoomType = string.IsNullOrWhiteSpace(roomType) ? null : Enum.Parse<Domain.Enums.RoomType>(roomType, true)
+                RoomType = roomType
             };
 
             var rooms = service.Search(request);

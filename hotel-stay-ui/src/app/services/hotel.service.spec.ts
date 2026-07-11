@@ -78,7 +78,7 @@ describe('HotelService', () => {
   });
 
   it('reserveRoom posts to /hotels/reserve with request body', (done) => {
-    const mockResponse = { referenceNumber: 'REF-abc12345' };
+    const mockResponse = 'REF-abc12345';
     httpSpy.post.and.returnValue(of(mockResponse));
 
     const request: ReservationRequest = {
@@ -93,8 +93,8 @@ describe('HotelService', () => {
     };
 
     service.reserveRoom(request).subscribe(res => {
-      expect(res.referenceNumber).toBe('REF-abc12345');
-      expect(httpSpy.post).toHaveBeenCalledWith('/hotels/reserve', request);
+      expect(res).toBe('REF-abc12345');
+      expect(httpSpy.post).toHaveBeenCalledWith('/hotels/reserve', request, jasmine.objectContaining({ responseType: 'text' }));
       done();
     });
   });

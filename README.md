@@ -191,23 +191,78 @@ See [`openspec/config.yaml`](openspec/config.yaml) for project-specific rules an
 
 ---
 
-# Cheat-sheet quick date lookup
+# Cheat Sheet: Stub Data Quick Reference
 
-Run this one-liner in PowerShell to print today's concrete stub dates:
+## Available Date Ranges
+
+**All regions start availability tomorrow (today + 1) with staggered end dates:**
+
+| Region | Cities | Start Date | End Date | Duration |
+|--------|--------|------------|----------|----------|
+| **India** 🇮🇳 | BOM, BLR, DEL | Tomorrow | Today + 30 | 30 days |
+| **UK** 🇬🇧 | LON, MAN | Tomorrow | Today + 45 | 45 days |
+| **US** 🇺🇸 | NYC, LAX, CHI | Tomorrow | Today + 60 | 60 days |
+| **Japan** 🇯🇵 | TYO, OSA | Tomorrow | Today + 90 | 90 days |
+
+**Quick Date Check (PowerShell):**
 
 ```powershell
-$today = (Get-Date).Date
-[pscustomobject]@{
-  India_CheckIn  = $today.AddDays(30).ToString('yyyy-MM-dd')
-  India_CheckOut = $today.AddDays(35).ToString('yyyy-MM-dd')
-  UK_CheckIn     = $today.AddDays(45).ToString('yyyy-MM-dd')
-  UK_CheckOut    = $today.AddDays(50).ToString('yyyy-MM-dd')
-  US_CheckIn     = $today.AddDays(60).ToString('yyyy-MM-dd')
-  US_CheckOut    = $today.AddDays(65).ToString('yyyy-MM-dd')
-  Japan_CheckIn  = $today.AddDays(75).ToString('yyyy-MM-dd')
-  Japan_CheckOut = $today.AddDays(80).ToString('yyyy-MM-dd')
-} | Format-List
+$today = Get-Date
+Write-Host "Today: $($today.ToString('yyyy-MM-dd'))`n"
+Write-Host "India:  $($today.AddDays(1).ToString('yyyy-MM-dd')) to $($today.AddDays(30).ToString('yyyy-MM-dd'))"
+Write-Host "UK:     $($today.AddDays(1).ToString('yyyy-MM-dd')) to $($today.AddDays(45).ToString('yyyy-MM-dd'))"
+Write-Host "US:     $($today.AddDays(1).ToString('yyyy-MM-dd')) to $($today.AddDays(60).ToString('yyyy-MM-dd'))"
+Write-Host "Japan:  $($today.AddDays(1).ToString('yyyy-MM-dd')) to $($today.AddDays(90).ToString('yyyy-MM-dd'))"
 ```
+
+## Quick Test Examples
+
+**Example 1: Short Weekend Stay in Mumbai (2 nights)**
+```
+Destination: Mumbai (BOM)
+CheckIn:  Tomorrow
+CheckOut: Tomorrow + 2 days
+```
+
+**Example 2: Week-long London Trip (7 nights)**
+```
+Destination: London (LON)
+CheckIn:  Tomorrow + 7 days
+CheckOut: Tomorrow + 14 days
+```
+
+**Example 3: Extended Tokyo Stay (14 nights)**
+```
+Destination: Tokyo (TYO)
+CheckIn:  Tomorrow + 30 days
+CheckOut: Tomorrow + 44 days
+```
+
+## Available Destinations
+
+### Domestic (India) 🇮🇳 - Requires Passport OR National ID
+- **Mumbai (BOM)** - 6 rooms across both providers (Standard, Deluxe, Suite)
+- **Delhi (DEL)** - 2 rooms (BudgetNests only)
+- **Bangalore (BLR)** - 2 rooms (PremierStays only)
+
+### International - Requires Passport ONLY
+- **London (LON)** 🇬🇧 - 4 rooms (UK)
+- **Manchester (MAN)** 🇬🇧 - 2 rooms (UK)
+- **New York (NYC)** 🇺🇸 - 4 rooms (US)
+- **Los Angeles (LAX)** 🇺🇸 - 2 rooms (US, PremierStays only)
+- **Chicago (CHI)** 🇺🇸 - 2 rooms (US, PremierStays only)
+- **Tokyo (TYO)** 🇯🇵 - 4 rooms (Japan)
+- **Osaka (OSA)** 🇯🇵 - 2 rooms (Japan, PremierStays only)
+
+## Provider Comparison
+
+| Feature | PremierStays | BudgetNests |
+|---------|-------------|-------------|
+| **Data Format** | PascalCase JSON | snake_case JSON |
+| **Detail Level** | Full (amenities, star rating) | Minimal (rate, policy only) |
+| **Cancellation** | "Free Cancellation Upto 48h" | "Flexible" |
+| **Availability** | Always available | May return `available: false` |
+| **Coverage** | All 10 cities | 7 cities (no LAX, CHI, OSA) |
 
 ## About spec.md and prompts.md
 

@@ -60,7 +60,7 @@ public static class HotelEndpoints
             return Results.Ok(new { results = rooms });
         })
         .WithName("SearchHotels")
-        .Produces<IEnumerable<Room>>(StatusCodes.Status200OK)
+        .Produces<IEnumerable<HotelSearchResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest);
 
         group.MapPost("/reserve", async (
@@ -74,7 +74,7 @@ public static class HotelEndpoints
                 statusCode: StatusCodes.Status201Created);
             })
             .WithName("ReserveHotel")
-            .Produces<ReservationResponse>(StatusCodes.Status201Created)
+            .Produces<string>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status422UnprocessableEntity);

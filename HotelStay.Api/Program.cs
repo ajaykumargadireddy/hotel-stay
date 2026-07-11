@@ -10,9 +10,10 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Microsoft.Extensions.Logging with file logging
+// Configure Microsoft.Extensions.Logging with console + rolling file logging (Karambolo)
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.AddLoggingProvider();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddServices();

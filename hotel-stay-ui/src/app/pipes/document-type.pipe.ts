@@ -11,6 +11,19 @@ export class DocumentTypePipe implements PipeTransform {
       return '';
     }
 
+    // If it's a numeric string, convert to number first
+    if (typeof value === 'string' && !isNaN(Number(value))) {
+      const numValue = parseInt(value, 10);
+      switch (numValue) {
+        case 0:
+          return 'Passport';
+        case 1:
+          return 'National ID';
+        default:
+          return String(value);
+      }
+    }
+
     // If it's already a string enum value, format it
     if (typeof value === 'string') {
       if (value === DocumentType.NationalId || value === 'NationalId') {
@@ -23,7 +36,7 @@ export class DocumentTypePipe implements PipeTransform {
     }
 
     // Convert numeric value to enum string
-    const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+    const numValue = typeof value === 'number' ? value : 0;
     
     switch (numValue) {
       case 0:

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
 using HotelStay.Application.Services;
@@ -32,7 +34,7 @@ public class HotelSearchServiceTests
     }
 
     [Fact]
-    public void Search_ShouldAggregateResultsFromMultipleProviders()
+    public async Task Search_ShouldAggregateResultsFromMultipleProviders()
     {
         // Arrange
         var request = new HotelSearchRequest
@@ -47,29 +49,29 @@ public class HotelSearchServiceTests
         var provider2Room = CreateTestRoom("Provider2", Guid.NewGuid());
 
         var mockProvider1 = new Mock<IHotelProvider>();
-        mockProvider1.Setup(p => p.Search(It.IsAny<HotelSearchRequest>()))
-            .Returns(new[] { provider1Room });
+        mockProvider1.Setup(p => p.SearchAsync(It.IsAny<HotelSearchRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { provider1Room });
 
         var mockProvider2 = new Mock<IHotelProvider>();
-        mockProvider2.Setup(p => p.Search(It.IsAny<HotelSearchRequest>()))
-            .Returns(new[] { provider2Room });
+        mockProvider2.Setup(p => p.SearchAsync(It.IsAny<HotelSearchRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { provider2Room });
 
         var providers = new List<IHotelProvider> { mockProvider1.Object, mockProvider2.Object };
         var service = new HotelSearchService(providers);
 
         // Act
-        var results = service.Search(request).ToList();
+        var results = (await service.SearchAsync(request)).ToList();
 
         // Assert
         Assert.Equal(2, results.Count);
         Assert.Contains(results, r => r.Room.Provider == "Provider1");
         Assert.Contains(results, r => r.Room.Provider == "Provider2");
-        mockProvider1.Verify(p => p.Search(request), Times.Once);
-        mockProvider2.Verify(p => p.Search(request), Times.Once);
+        mockProvider1.Verify(p => p.SearchAsync(request, It.IsAny<CancellationToken>()), Times.Once);
+        mockProvider2.Verify(p => p.SearchAsync(request, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public void Search_WhenNoProvidersHaveMatchingRooms_ShouldReturnEmptyList()
+    public async Task Search_WhenNoProvidersHaveMatchingRooms_ShouldReturnEmptyList()
     {
         // Arrange
         var request = new HotelSearchRequest
@@ -81,25 +83,25 @@ public class HotelSearchServiceTests
         };
 
         var mockProvider1 = new Mock<IHotelProvider>();
-        mockProvider1.Setup(p => p.Search(It.IsAny<HotelSearchRequest>()))
-            .Returns(Enumerable.Empty<Room>());
+        mockProvider1.Setup(p => p.SearchAsync(It.IsAny<HotelSearchRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Room>());
 
         var mockProvider2 = new Mock<IHotelProvider>();
-        mockProvider2.Setup(p => p.Search(It.IsAny<HotelSearchRequest>()))
-            .Returns(Enumerable.Empty<Room>());
+        mockProvider2.Setup(p => p.SearchAsync(It.IsAny<HotelSearchRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<Room>());
 
         var providers = new List<IHotelProvider> { mockProvider1.Object, mockProvider2.Object };
         var service = new HotelSearchService(providers);
 
         // Act
-        var results = service.Search(request).ToList();
+        var results = (await service.SearchAsync(request)).ToList();
 
         // Assert
         Assert.Empty(results);
     }
 
     [Fact]
-    public void Search_RoomComputedProperties_ShouldCalculateCorrectly()
+    public async Task Search_RoomComputedProperties_ShouldCalculateCorrectly()
     {
         // Arrange
         var request = new HotelSearchRequest
@@ -125,14 +127,14 @@ public class HotelSearchServiceTests
         );
 
         var mockProvider = new Mock<IHotelProvider>();
-        mockProvider.Setup(p => p.Search(It.IsAny<HotelSearchRequest>()))
-            .Returns(new[] { room });
+        mockProvider.Setup(p => p.SearchAsync(It.IsAny<HotelSearchRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { room });
 
         var providers = new List<IHotelProvider> { mockProvider.Object };
         var service = new HotelSearchService(providers);
 
         // Act
-        var results = service.Search(request).ToList();
+        var results = (await service.SearchAsync(request)).ToList();
 
         // Assert
         Assert.Single(results);

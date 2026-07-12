@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
 using HotelStay.Application.Mappers;
@@ -21,12 +23,12 @@ public class ReservationService : IReservationService
         _repository = repository;
     }
 
-    public string Reserve(ReservationRequest request)
+    public async Task<string> ReserveAsync(ReservationRequest request, CancellationToken cancellationToken = default)
     {
-        // 1. Fetch Room by roomId from providers (query all until found)
-        var room = _providers
-            .Select(p => p.GetRoomById(request.RoomId))
-            .FirstOrDefault(r => r != null);
+        // 1. Fetch Room by roomId from providers (query all in parallel until found)
+        var roomTasks = _providers.Select(p => p.GetRoomByIdAsync(request.RoomId, cancellationToken));
+        var rooms = await Task.WhenAll(roomTasks);
+        var room = rooms.FirstOrDefault(r => r != null);
 
         if (room == null)
         {
@@ -49,14 +51,14 @@ public class ReservationService : IReservationService
         );
 
         // 4. Persist and return
-        _repository.Add(reservation);
+        await _repository.AddAsync(reservation, cancellationToken);
         return referenceNumber;
     }
 
-    public ReservationResponse GetByReference(string referenceNumber)
+    public async Task<ReservationResponse> GetByReferenceAsync(string referenceNumber, CancellationToken cancellationToken = default)
     {
-        var reservation = _repository.GetByReference(referenceNumber);
-        
+        var reservation = await _repository.GetByReferenceAsync(referenceNumber, cancellationToken);
+
         if (reservation == null)
         {
             throw new ReservationNotFoundException("Reservation not found");

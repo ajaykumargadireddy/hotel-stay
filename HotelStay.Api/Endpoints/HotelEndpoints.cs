@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
 using HotelStay.Domain.Enums;
@@ -24,7 +25,8 @@ public static class HotelEndpoints
             [FromQuery] DateTime? checkIn,
             [FromQuery] DateTime? checkOut,
             [FromQuery] RoomType? roomType,
-            [FromServices] IHotelSearchService service) =>
+            [FromServices] IHotelSearchService service,
+            CancellationToken cancellationToken) =>
         {
             // Validate required parameters
             if (string.IsNullOrWhiteSpace(destination))
@@ -56,7 +58,7 @@ public static class HotelEndpoints
                 RoomType = roomType
             };
 
-            var rooms = service.Search(request);
+            var rooms = await service.SearchAsync(request, cancellationToken);
             return Results.Ok(new { results = rooms });
         })
         .WithName("SearchHotels")
@@ -65,9 +67,10 @@ public static class HotelEndpoints
 
         group.MapPost("/reserve", async (
             [FromBody] ReservationRequest request,
-            [FromServices] IReservationService service) =>
+            [FromServices] IReservationService service,
+            CancellationToken cancellationToken) =>
                 {
-            var reservation = service.Reserve(request);
+            var reservation = await service.ReserveAsync(request, cancellationToken);
 
             return Results.Text(
                 reservation,
@@ -82,9 +85,10 @@ public static class HotelEndpoints
         // GET /hotels/reservation/{reference}
         group.MapGet("/reservation/{reference}", async (
             [FromRoute] string reference,
-            [FromServices] IReservationService service) =>
+            [FromServices] IReservationService service,
+            CancellationToken cancellationToken) =>
         {
-            var reservation = service.GetByReference(reference);
+            var reservation = await service.GetByReferenceAsync(reference, cancellationToken);
             return Results.Ok(reservation);
         })
         .WithName("GetReservation")

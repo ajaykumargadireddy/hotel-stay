@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using HotelStay.Application.DTOs;
 using HotelStay.Domain.Enums;
 using HotelStay.Infrastructure.Providers;
@@ -11,7 +12,7 @@ namespace HotelStay.Tests.Infrastructure;
 public class BudgetNestsProviderTests
 {
     [Fact]
-    public void Search_ShouldFilterByDestination_CaseInsensitive()
+    public async Task Search_ShouldFilterByDestination_CaseInsensitive()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
@@ -23,7 +24,7 @@ public class BudgetNestsProviderTests
         };
 
         // Act
-        var results = provider.Search(request).ToList();
+        var results = (await provider.SearchAsync(request)).ToList();
 
         // Assert
         Assert.NotEmpty(results);
@@ -31,7 +32,7 @@ public class BudgetNestsProviderTests
     }
 
     [Fact]
-    public void Search_ShouldFilterByRoomType()
+    public async Task Search_ShouldFilterByRoomType()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
@@ -44,7 +45,7 @@ public class BudgetNestsProviderTests
         };
 
         // Act
-        var results = provider.Search(request).ToList();
+        var results = (await provider.SearchAsync(request)).ToList();
 
         // Assert
         Assert.NotEmpty(results);
@@ -52,7 +53,7 @@ public class BudgetNestsProviderTests
     }
 
     [Fact]
-    public void Search_ShouldFilterByDateRange()
+    public async Task Search_ShouldFilterByDateRange()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
@@ -64,7 +65,7 @@ public class BudgetNestsProviderTests
         };
 
         // Act
-        var results = provider.Search(request).ToList();
+        var results = (await provider.SearchAsync(request)).ToList();
 
         // Assert
         Assert.NotEmpty(results);
@@ -76,7 +77,7 @@ public class BudgetNestsProviderTests
     }
 
     [Fact]
-    public void Search_ShouldFilterOutUnavailableRooms()
+    public async Task Search_ShouldFilterOutUnavailableRooms()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
@@ -88,7 +89,7 @@ public class BudgetNestsProviderTests
         };
 
         // Act
-        var results = provider.Search(request).ToList();
+        var results = (await provider.SearchAsync(request)).ToList();
 
         // Assert
         Assert.NotEmpty(results);
@@ -98,7 +99,7 @@ public class BudgetNestsProviderTests
     }
 
     [Fact]
-    public void Search_ShouldReturnDeterministicResults()
+    public async Task Search_ShouldReturnDeterministicResults()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
@@ -111,8 +112,8 @@ public class BudgetNestsProviderTests
         };
 
         // Act
-        var results1 = provider.Search(request).ToList();
-        var results2 = provider.Search(request).ToList();
+        var results1 = (await provider.SearchAsync(request)).ToList();
+        var results2 = (await provider.SearchAsync(request)).ToList();
 
         // Assert
         Assert.Equal(results1.Count, results2.Count);
@@ -125,14 +126,14 @@ public class BudgetNestsProviderTests
     }
 
     [Fact]
-    public void GetRoomById_WhenGuidExists_ShouldReturnRoom()
+    public async Task GetRoomById_WhenGuidExists_ShouldReturnRoom()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
         var roomId = Guid.Parse("44444444-1111-1111-1111-111111111111"); // Known room ID from stub data
 
         // Act
-        var room = provider.GetRoomById(roomId);
+        var room = await provider.GetRoomByIdAsync(roomId);
 
         // Assert
         Assert.NotNull(room);
@@ -141,21 +142,21 @@ public class BudgetNestsProviderTests
     }
 
     [Fact]
-    public void GetRoomById_WhenGuidNotFound_ShouldReturnNull()
+    public async Task GetRoomById_WhenGuidNotFound_ShouldReturnNull()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
         var nonExistentRoomId = Guid.NewGuid();
 
         // Act
-        var room = provider.GetRoomById(nonExistentRoomId);
+        var room = await provider.GetRoomByIdAsync(nonExistentRoomId);
 
         // Assert
         Assert.Null(room);
     }
 
     [Fact]
-    public void Search_BudgetNestsHasMinimalData()
+    public async Task Search_BudgetNestsHasMinimalData()
     {
         // Arrange
         var provider = new BudgetNestsProvider();
@@ -167,7 +168,7 @@ public class BudgetNestsProviderTests
         };
 
         // Act
-        var results = provider.Search(request).ToList();
+        var results = (await provider.SearchAsync(request)).ToList();
 
         // Assert
         Assert.NotEmpty(results);

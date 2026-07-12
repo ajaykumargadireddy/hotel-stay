@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
 using HotelStay.Application.Services;
@@ -34,23 +36,23 @@ public class ReservationServiceTests
     }
 
     [Fact]
-    public void Reserve_ShouldCallGetRoomByIdOnProvidersUntilFound()
+    public async Task Reserve_ShouldCallGetRoomByIdOnProvidersUntilFound()
     {
         // Arrange
         var roomId = Guid.NewGuid();
         var room = CreateTestRoom(roomId);
 
         var mockProvider1 = new Mock<IHotelProvider>();
-        mockProvider1.Setup(p => p.GetRoomById(roomId)).Returns((Room?)null);
+        mockProvider1.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>())).ReturnsAsync((Room?)null);
 
         var mockProvider2 = new Mock<IHotelProvider>();
-        mockProvider2.Setup(p => p.GetRoomById(roomId)).Returns(room);
+        mockProvider2.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>())).ReturnsAsync(room);
 
         var mockProvider3 = new Mock<IHotelProvider>();
-        // Should not be called since room is found in provider2
+        mockProvider3.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>())).ReturnsAsync((Room?)null);
 
         var mockRepository = new Mock<IReservationRepository>();
-        mockRepository.Setup(r => r.Add(It.IsAny<Reservation>()));
+        mockRepository.Setup(r => r.AddAsync(It.IsAny<Reservation>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var providers = new List<IHotelProvider> { mockProvider1.Object, mockProvider2.Object, mockProvider3.Object };
         var service = new ReservationService(providers, mockRepository.Object);
@@ -69,26 +71,26 @@ public class ReservationServiceTests
         };
 
         // Act
-        var response = service.Reserve(request);
+        var response = await service.ReserveAsync(request);
 
         // Assert
         Assert.NotNull(response);
-        mockProvider1.Verify(p => p.GetRoomById(roomId), Times.Once);
-        mockProvider2.Verify(p => p.GetRoomById(roomId), Times.Once);
-        mockProvider3.Verify(p => p.GetRoomById(roomId), Times.Never);
+        mockProvider1.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+        mockProvider2.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+        mockProvider3.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public void Reserve_WhenRoomIdNotFoundInAnyProvider_ShouldThrowDomainValidationException()
+    public async Task Reserve_WhenRoomIdNotFoundInAnyProvider_ShouldThrowDomainValidationException()
     {
         // Arrange
         var roomId = Guid.NewGuid();
 
         var mockProvider1 = new Mock<IHotelProvider>();
-        mockProvider1.Setup(p => p.GetRoomById(roomId)).Returns((Room?)null);
+        mockProvider1.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>())).ReturnsAsync((Room?)null);
 
         var mockProvider2 = new Mock<IHotelProvider>();
-        mockProvider2.Setup(p => p.GetRoomById(roomId)).Returns((Room?)null);
+        mockProvider2.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>())).ReturnsAsync((Room?)null);
 
         var mockRepository = new Mock<IReservationRepository>();
 
@@ -109,21 +111,21 @@ public class ReservationServiceTests
         };
 
         // Act & Assert
-        var exception = Assert.Throws<DomainValidationException>(() => service.Reserve(request));
+        var exception = await Assert.ThrowsAsync<DomainValidationException>(() => service.ReserveAsync(request));
     }
 
     [Fact]
-    public void Reserve_ShouldGenerateReferenceNumberWithCorrectFormat()
+    public async Task Reserve_ShouldGenerateReferenceNumberWithCorrectFormat()
     {
         // Arrange
         var roomId = Guid.NewGuid();
         var room = CreateTestRoom(roomId);
 
         var mockProvider = new Mock<IHotelProvider>();
-        mockProvider.Setup(p => p.GetRoomById(roomId)).Returns(room);
+        mockProvider.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>())).ReturnsAsync(room);
 
         var mockRepository = new Mock<IReservationRepository>();
-        mockRepository.Setup(r => r.Add(It.IsAny<Reservation>()));
+        mockRepository.Setup(r => r.AddAsync(It.IsAny<Reservation>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var providers = new List<IHotelProvider> { mockProvider.Object };
         var service = new ReservationService(providers, mockRepository.Object);
@@ -142,7 +144,7 @@ public class ReservationServiceTests
         };
 
         // Act
-        var response = service.Reserve(request);
+        var response = await service.ReserveAsync(request);
 
         // Assert
         Assert.NotNull(response);
@@ -152,19 +154,20 @@ public class ReservationServiceTests
     }
 
     [Fact]
-    public void Reserve_ShouldPersistReservationViaRepository()
+    public async Task Reserve_ShouldPersistReservationViaRepository()
     {
         // Arrange
         var roomId = Guid.NewGuid();
         var room = CreateTestRoom(roomId);
 
         var mockProvider = new Mock<IHotelProvider>();
-        mockProvider.Setup(p => p.GetRoomById(roomId)).Returns(room);
+        mockProvider.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>())).ReturnsAsync(room);
 
         var mockRepository = new Mock<IReservationRepository>();
         Reservation? capturedReservation = null;
-        mockRepository.Setup(r => r.Add(It.IsAny<Reservation>()))
-            .Callback<Reservation>(r => capturedReservation = r);
+        mockRepository.Setup(r => r.AddAsync(It.IsAny<Reservation>(), It.IsAny<CancellationToken>()))
+            .Callback<Reservation, CancellationToken>((r, ct) => capturedReservation = r)
+            .Returns(Task.CompletedTask);
 
         var providers = new List<IHotelProvider> { mockProvider.Object };
         var service = new ReservationService(providers, mockRepository.Object);
@@ -183,10 +186,10 @@ public class ReservationServiceTests
         };
 
         // Act
-        var response = service.Reserve(request);
+        var response = await service.ReserveAsync(request);
 
         // Assert
-        mockRepository.Verify(r => r.Add(It.IsAny<Reservation>()), Times.Once);
+        mockRepository.Verify(r => r.AddAsync(It.IsAny<Reservation>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.NotNull(capturedReservation);
         Assert.Equal(room, capturedReservation.Room);
         Assert.Equal("Jane Smith", capturedReservation.Document.HolderName);
@@ -195,7 +198,7 @@ public class ReservationServiceTests
     }
 
     [Fact]
-    public void GetByReference_ShouldRetrieveReservationSuccessfully()
+    public async Task GetByReference_ShouldRetrieveReservationSuccessfully()
     {
         // Arrange
         var referenceNumber = "REF-12345678";
@@ -211,38 +214,38 @@ public class ReservationServiceTests
             reservationTimestamp: DateTime.Now);
 
         var mockRepository = new Mock<IReservationRepository>();
-        mockRepository.Setup(r => r.GetByReference(referenceNumber)).Returns(reservation);
+        mockRepository.Setup(r => r.GetByReferenceAsync(referenceNumber, It.IsAny<CancellationToken>())).ReturnsAsync(reservation);
 
         var mockProvider = new Mock<IHotelProvider>();
         var providers = new List<IHotelProvider> { mockProvider.Object };
         var service = new ReservationService(providers, mockRepository.Object);
 
         // Act
-        var response = service.GetByReference(referenceNumber);
+        var response = await service.GetByReferenceAsync(referenceNumber);
 
         // Assert
         Assert.NotNull(response);
         Assert.Equal(reservation.ReferenceNumber, response.ReferenceNumber);
         Assert.Equal(room.RoomId, response.RoomId);
         Assert.Equal("John Doe", response.Document.HolderName);
-        mockRepository.Verify(r => r.GetByReference(referenceNumber), Times.Once);
+        mockRepository.Verify(r => r.GetByReferenceAsync(referenceNumber, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public void GetByReference_WhenNotFound_ShouldThrowReservationNotFoundException()
+    public async Task GetByReference_WhenNotFound_ShouldThrowReservationNotFoundException()
     {
         // Arrange
         var referenceNumber = "REF-99999999";
 
         var mockRepository = new Mock<IReservationRepository>();
-        mockRepository.Setup(r => r.GetByReference(referenceNumber)).Returns((Reservation?)null);
+        mockRepository.Setup(r => r.GetByReferenceAsync(referenceNumber, It.IsAny<CancellationToken>())).ReturnsAsync((Reservation?)null);
 
         var mockProvider = new Mock<IHotelProvider>();
         var providers = new List<IHotelProvider> { mockProvider.Object };
         var service = new ReservationService(providers, mockRepository.Object);
 
         // Act & Assert
-        var exception = Assert.Throws<ReservationNotFoundException>(() => service.GetByReference(referenceNumber));
+        var exception = await Assert.ThrowsAsync<ReservationNotFoundException>(() => service.GetByReferenceAsync(referenceNumber));
         Assert.NotNull(exception.Message);
     }
 }

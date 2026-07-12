@@ -68,7 +68,12 @@
   }
 
   &--submit {
-    justify-content: flex-end;
     min-height: auto;
+    align-self: end;
+    padding-bottom: 0.5em; // Offset for field__error min-height in other fields
+
+    .btn {
+      height: 38px; // Match input height
+    }
   }
 }

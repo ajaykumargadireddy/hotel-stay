@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
 using HotelStay.Domain.ValueObjects;
@@ -9,8 +11,10 @@ namespace HotelStay.Infrastructure.Providers.BudgetNests;
 
 public class BudgetNestsProvider : IHotelProvider
 {
-    public IEnumerable<Room> Search(HotelSearchRequest request)
+    public Task<IEnumerable<Room>> SearchAsync(HotelSearchRequest request, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var matchingRooms = BudgetNestsStubData.Catalog.Values
             .Where(entry =>
                 entry.available &&  // Filter out unavailable rooms
@@ -21,16 +25,18 @@ public class BudgetNestsProvider : IHotelProvider
             .Select(BudgetNestsMapper.ToRoom)
             .ToList();
 
-        return matchingRooms;
+        return Task.FromResult<IEnumerable<Room>>(matchingRooms);
     }
 
-    public Room? GetRoomById(Guid roomId)
+    public Task<Room?> GetRoomByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (BudgetNestsStubData.Catalog.TryGetValue(roomId, out var entry))
         {
-            return BudgetNestsMapper.ToRoom(entry);
+            return Task.FromResult<Room?>(BudgetNestsMapper.ToRoom(entry));
         }
 
-        return null;
+        return Task.FromResult<Room?>(null);
     }
 }

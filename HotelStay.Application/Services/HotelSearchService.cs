@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using HotelStay.Application.Abstractions;
 using HotelStay.Application.DTOs;
 
@@ -14,14 +16,17 @@ public class HotelSearchService : IHotelSearchService
         _providers = providers;
     }
 
-    public IEnumerable<HotelSearchResponse> Search(HotelSearchRequest request)
+    public async Task<IEnumerable<HotelSearchResponse>> SearchAsync(HotelSearchRequest request, CancellationToken cancellationToken = default)
     {
         request.Validate();
+
         // Query all providers in parallel and aggregate results
-        var rooms = _providers
-            .AsParallel()
-            .SelectMany(provider => provider.Search(request))
-            .ToList().OrderBy(x => x.PerNightRate);
+        var searchTasks = _providers.Select(provider => provider.SearchAsync(request, cancellationToken));
+        var results = await Task.WhenAll(searchTasks);
+
+        var rooms = results
+            .SelectMany(r => r)
+            .OrderBy(x => x.PerNightRate);
 
         return rooms.Select(room => HotelSearchResponse.Create(room, request.CheckIn, request.CheckOut));
     }

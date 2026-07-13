@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,4 +9,5 @@ namespace HotelStay.Application.Abstractions;
 public interface IHotelSearchService
 {
     Task<IEnumerable<HotelSearchResponse>> SearchAsync(HotelSearchRequest request, CancellationToken cancellationToken = default);
+    Task<RoomDetailsResponse?> GetRoomByIdAsync(Guid roomId, CancellationToken cancellationToken = default);
 }

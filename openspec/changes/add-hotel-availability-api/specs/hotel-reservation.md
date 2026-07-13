@@ -16,7 +16,7 @@ The reservation endpoint validates room availability, enforces document validati
 - **SHALL** calculate `totalPrice` as `perNightRate * numberOfNights`
 - **SHALL** set `reservationTimestamp` to current server time in `yyyy-MM-dd HH:mm:ss` format
 - **SHALL** store reservation in-memory (ConcurrentDictionary)
-- **SHALL** return 201 Created with full reservation details including room information
+- **SHALL** return 201 Created with JSON body containing `referenceNumber`
 - **SHALL** return 400 Bad Request when `roomId` or `document` fields are missing/invalid
 - **SHALL** return 404 Not Found when `roomId` does not exist in any provider catalog
 - **SHALL** return 422 Unprocessable Entity when document type violates location rules
@@ -38,25 +38,11 @@ The reservation endpoint validates room availability, enforces document validati
 
 ```json
 {
-  "referenceNumber": "string (REF-{8-char-GUID})",
-  "roomId": "string (GUID)",
-  "destination": "string (cityCode, e.g., BOM, LON, NYC)",
-  "location": "string (country name)",
-  "roomType": "Standard|Deluxe|Suite",
-  "checkIn": "DateTime",
-  "checkOut": "DateTime",
-  "numberOfNights": "integer",
-  "totalPrice": "decimal",
-  "currency": "string (ISO 4217)",
-  "provider": "string",
-  "document": {
-    "holderName": "string",
-    "type": "Passport|NationalId",
-    "number": "string"
-  },
-  "reservationTimestamp": "DateTime"
+  "referenceNumber": "string (REF-{8-char-GUID})"
 }
 ```
+
+**Note:** To retrieve full reservation details, use `GET /hotels/reservation/{referenceNumber}`
 
 ---
 
@@ -80,36 +66,9 @@ The reservation endpoint validates room availability, enforces document validati
 ```
 **THEN** response status is 201 Created  
 **AND** response body contains:
-- `referenceNumber` matching pattern `REF-[a-f0-9]{8}`
-- `roomId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"`
-- `destination: "LON"`, `location: "United Kingdom"`
-- `roomType: "Deluxe"`
-- `checkIn: "2024-03-15T15:00:00"`, `checkOut: "2024-03-20T11:00:00"`
-- `numberOfNights: 5`, `totalPrice: 750.00`, `currency: "GBP"`
-- `provider: "PremierStays"`
-- `document` echoing the request
-- `reservationTimestamp` in ISO 8601 format (current server time)
-
-**Example Response (camelCase — default .NET minimal API JSON):**
 ```json
 {
-  "referenceNumber": "REF-3fa85f64",
-  "roomId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "destination": "LON",
-  "location": "United Kingdom",
-  "roomType": "Deluxe",
-  "checkIn": "2024-03-15T15:00:00",
-  "checkOut": "2024-03-20T11:00:00",
-  "numberOfNights": 5,
-  "totalPrice": 750.00,
-  "currency": "GBP",
-  "provider": "PremierStays",
-  "document": {
-    "holderName": "John Doe",
-    "type": "Passport",
-    "number": "AB1234567"
-  },
-  "reservationTimestamp": "2024-03-10T14:30:00"
+  "referenceNumber": "REF-3fa85f64"
 }
 ```
 
@@ -132,8 +91,12 @@ The reservation endpoint validates room availability, enforces document validati
 }
 ```
 **THEN** response status is 201 Created  
-**AND** response includes `destination: "BOM"`, `location: "India"`, `currency: "INR"`, `numberOfNights: 4`  
-**AND** document type `NationalId` is accepted  
+**AND** response body contains `referenceNumber` matching pattern `REF-[a-f0-9]{8}`
+```json
+{
+  "referenceNumber": "REF-9a1b2c3d"
+}
+```
 
 ---
 

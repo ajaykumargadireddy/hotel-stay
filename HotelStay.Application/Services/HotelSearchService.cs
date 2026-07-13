@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -29,5 +30,32 @@ public class HotelSearchService : IHotelSearchService
             .OrderBy(x => x.PerNightRate);
 
         return rooms.Select(room => HotelSearchResponse.Create(room, request.CheckIn, request.CheckOut));
+    }
+
+    public async Task<RoomDetailsResponse?> GetRoomByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        // Query all providers in parallel until room is found
+        var roomTasks = _providers.Select(p => p.GetRoomByIdAsync(roomId, cancellationToken));
+        var rooms = await Task.WhenAll(roomTasks);
+        var room = rooms.FirstOrDefault(r => r != null);
+
+        if (room == null)
+        {
+            return null;
+        }
+
+        return new RoomDetailsResponse
+        {
+            RoomId = room.RoomId,
+            Provider = room.Provider,
+            Destination = room.Destination,
+            Location = room.Location,
+            RoomType = room.RoomType.ToString(),
+            PerNightRate = room.PerNightRate,
+            Currency = room.Currency,
+            CancellationPolicy = room.CancellationPolicy,
+            Amenities = room.Amenities.ToArray(),
+            StarRating = room.StarRating
+        };
     }
 }

@@ -159,8 +159,10 @@ Content-Type: application/json
 
 **Example Response:** `201 Created`
 
-```text
-REF-3dde8e7a
+```json
+{
+  "referenceNumber": "REF-3dde8e7a"
+}
 ```
 
 **Error Responses:**

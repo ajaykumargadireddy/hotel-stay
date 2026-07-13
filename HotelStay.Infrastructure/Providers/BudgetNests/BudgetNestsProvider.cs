@@ -11,7 +11,7 @@ namespace HotelStay.Infrastructure.Providers.BudgetNests;
 
 public class BudgetNestsProvider : IHotelProvider
 {
-    public Task<IEnumerable<Room>> SearchAsync(HotelSearchRequest request, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Room>> SearchAsync(HotelSearchRequest request, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -25,18 +25,18 @@ public class BudgetNestsProvider : IHotelProvider
             .Select(BudgetNestsMapper.ToRoom)
             .ToList();
 
-        return Task.FromResult<IEnumerable<Room>>(matchingRooms);
+        return matchingRooms;
     }
 
-    public Task<Room?> GetRoomByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
+    public async Task<Room?> GetRoomByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         if (BudgetNestsStubData.Catalog.TryGetValue(roomId, out var entry))
         {
-            return Task.FromResult<Room?>(BudgetNestsMapper.ToRoom(entry));
+            return BudgetNestsMapper.ToRoom(entry);
         }
 
-        return Task.FromResult<Room?>(null);
+        return null;
     }
 }

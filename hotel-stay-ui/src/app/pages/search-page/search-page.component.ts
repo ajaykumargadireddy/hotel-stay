@@ -50,11 +50,13 @@ export class SearchPageComponent {
 
   onBook(room: RoomWithDetails): void {
     this.router.navigate(['/reserve', room.roomId], {
-      state: {
-        room,
-        countryCode: this.lastSearch?.countryCode,
+      queryParams: {
         checkIn: this.lastSearch?.checkIn,
         checkOut: this.lastSearch?.checkOut
+      },
+      state: {
+        room,
+        countryCode: this.lastSearch?.countryCode
       }
     });
   }

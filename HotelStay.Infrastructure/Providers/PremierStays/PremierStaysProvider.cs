@@ -13,8 +13,6 @@ public class PremierStaysProvider : IHotelProvider
 {
     public Task<IEnumerable<Room>> SearchAsync(HotelSearchRequest request, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         var matchingRooms = PremierStaysStubData.Catalog.Values
             .Where(entry =>
                 entry.Destination.Equals(request.Destination, StringComparison.OrdinalIgnoreCase) &&
@@ -29,8 +27,6 @@ public class PremierStaysProvider : IHotelProvider
 
     public Task<Room?> GetRoomByIdAsync(Guid roomId, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         if (PremierStaysStubData.Catalog.TryGetValue(roomId, out var entry))
         {
             return Task.FromResult<Room?>(PremierStaysMapper.ToRoom(entry));

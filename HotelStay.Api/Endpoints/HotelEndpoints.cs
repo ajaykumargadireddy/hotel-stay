@@ -70,17 +70,33 @@ public static class HotelEndpoints
             [FromServices] IReservationService service,
             CancellationToken cancellationToken) =>
                 {
-            var reservation = await service.ReserveAsync(request, cancellationToken);
-
-            return Results.Text(
-                reservation,
-                statusCode: StatusCodes.Status201Created);
+            var response = await service.ReserveAsync(request, cancellationToken);
+            return Results.Json(response, statusCode: StatusCodes.Status201Created);
             })
             .WithName("ReserveHotel")
-            .Produces<string>(StatusCodes.Status201Created)
+            .Produces<ReservationCreatedResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
+        // GET /hotels/room/{roomId}
+        group.MapGet("/room/{roomId:guid}", async (
+            [FromRoute] Guid roomId,
+            [FromServices] IHotelSearchService searchService,
+            CancellationToken cancellationToken) =>
+        {
+            var room = await searchService.GetRoomByIdAsync(roomId, cancellationToken);
+            
+            if (room == null)
+            {
+                return Results.NotFound(new { error = "Room not found" });
+            }
+            
+            return Results.Ok(room);
+        })
+        .WithName("GetRoomById")
+        .Produces<RoomDetailsResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound);
 
         // GET /hotels/reservation/{reference}
         group.MapGet("/reservation/{reference}", async (

@@ -142,4 +142,118 @@ public class HotelSearchServiceTests
         Assert.Equal(4, result.TotalNights); // Apr 1 to Apr 5 = 4 nights
         Assert.Equal(10000m, result.TotalPrice); // 2500 * 4 = 10000
     }
+
+    [Fact]
+    public async Task GetRoomByIdAsync_WhenRoomFoundInProvider_ShouldReturnRoomDetails()
+    {
+        // Arrange
+        var roomId = Guid.NewGuid();
+        var room = Room.Create(
+            roomId: roomId,
+            provider: "TestProvider",
+            destination: "BOM",
+            location: "India",
+            roomType: RoomType.Deluxe,
+            checkIn: DateTime.Parse("2024-04-01"),
+            checkOut: DateTime.Parse("2024-04-05"),
+            perNightRate: 5000m,
+            currency: "INR",
+            cancellationPolicy: "FreeCancellation",
+            amenities: new[] { "WiFi", "Pool" },
+            starRating: 4
+        );
+
+        var mockProvider1 = new Mock<IHotelProvider>();
+        mockProvider1.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Room?)null);
+
+        var mockProvider2 = new Mock<IHotelProvider>();
+        mockProvider2.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(room);
+
+        var providers = new List<IHotelProvider> { mockProvider1.Object, mockProvider2.Object };
+        var service = new HotelSearchService(providers);
+
+        // Act
+        var result = await service.GetRoomByIdAsync(roomId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(roomId, result.RoomId);
+        Assert.Equal("TestProvider", result.Provider);
+        Assert.Equal("BOM", result.Destination);
+        Assert.Equal("India", result.Location);
+        Assert.Equal("Deluxe", result.RoomType);
+        Assert.Equal(5000m, result.PerNightRate);
+        Assert.Equal("INR", result.Currency);
+        Assert.Equal("FreeCancellation", result.CancellationPolicy);
+        Assert.Equal(2, result.Amenities.Length);
+        Assert.Contains("WiFi", result.Amenities);
+        Assert.Contains("Pool", result.Amenities);
+        Assert.Equal(4, result.StarRating);
+        
+        mockProvider1.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+        mockProvider2.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetRoomByIdAsync_WhenRoomNotFoundInAnyProvider_ShouldReturnNull()
+    {
+        // Arrange
+        var roomId = Guid.NewGuid();
+
+        var mockProvider1 = new Mock<IHotelProvider>();
+        mockProvider1.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Room?)null);
+
+        var mockProvider2 = new Mock<IHotelProvider>();
+        mockProvider2.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Room?)null);
+
+        var providers = new List<IHotelProvider> { mockProvider1.Object, mockProvider2.Object };
+        var service = new HotelSearchService(providers);
+
+        // Act
+        var result = await service.GetRoomByIdAsync(roomId);
+
+        // Assert
+        Assert.Null(result);
+        mockProvider1.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+        mockProvider2.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetRoomByIdAsync_ShouldQueryAllProvidersInParallel()
+    {
+        // Arrange
+        var roomId = Guid.NewGuid();
+        var room = CreateTestRoom("Provider3", roomId);
+
+        var mockProvider1 = new Mock<IHotelProvider>();
+        mockProvider1.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Room?)null);
+
+        var mockProvider2 = new Mock<IHotelProvider>();
+        mockProvider2.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Room?)null);
+
+        var mockProvider3 = new Mock<IHotelProvider>();
+        mockProvider3.Setup(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(room);
+
+        var providers = new List<IHotelProvider> { mockProvider1.Object, mockProvider2.Object, mockProvider3.Object };
+        var service = new HotelSearchService(providers);
+
+        // Act
+        var result = await service.GetRoomByIdAsync(roomId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Provider3", result.Provider);
+        
+        // Verify all providers were queried
+        mockProvider1.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+        mockProvider2.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+        mockProvider3.Verify(p => p.GetRoomByIdAsync(roomId, It.IsAny<CancellationToken>()), Times.Once);
+    }
 }

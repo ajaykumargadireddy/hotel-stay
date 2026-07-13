@@ -1,4 +1,14 @@
-<section class="reservation-page" *ngIf="room">
+<div class="loading" *ngIf="loading">
+  <p>Loading room details...</p>
+</div>
+
+<div class="error-state" *ngIf="errorMessage && !room && !loading">
+  <h2>Unable to load room</h2>
+  <p>{{ errorMessage }}</p>
+  <button (click)="goToSearch()">Return to Search</button>
+</div>
+
+<section class="reservation-page" *ngIf="room && !loading">
   <h1>Complete your reservation</h1>
 
   <div class="reservation-page__layout">

@@ -5,6 +5,7 @@ import {
   HotelSearchRequest,
   HotelSearchResponse,
   RoomWithDetails,
+  RoomDetails,
   ReservationRequest,
   ReservationResponse
 } from '../models';
@@ -37,9 +38,13 @@ export class HotelService {
   }
 
   reserveRoom(request: ReservationRequest): Observable<string> {
-    return this.http.post('/hotels/reserve', request, { responseType: 'text' }).pipe(
-      map(reference => reference.replace(/^['"]|['"]$/g, '').trim())
+    return this.http.post<{ referenceNumber: string }>('/hotels/reserve', request).pipe(
+      map(response => response.referenceNumber)
     );
+  }
+
+  getRoomById(roomId: string): Observable<RoomDetails> {
+    return this.http.get<RoomDetails>(`/hotels/room/${roomId}`);
   }
 
   getReservation(reference: string): Observable<ReservationResponse> {

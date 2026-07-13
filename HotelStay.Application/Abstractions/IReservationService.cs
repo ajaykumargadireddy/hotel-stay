@@ -6,6 +6,6 @@ namespace HotelStay.Application.Abstractions;
 
 public interface IReservationService
 {
-    Task<string> ReserveAsync(ReservationRequest request, CancellationToken cancellationToken = default);
+    Task<ReservationCreatedResponse> ReserveAsync(ReservationRequest request, CancellationToken cancellationToken = default);
     Task<ReservationResponse> GetByReferenceAsync(string referenceNumber, CancellationToken cancellationToken = default);
 }

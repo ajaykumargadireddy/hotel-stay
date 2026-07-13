@@ -23,7 +23,7 @@ public class ReservationService : IReservationService
         _repository = repository;
     }
 
-    public async Task<string> ReserveAsync(ReservationRequest request, CancellationToken cancellationToken = default)
+    public async Task<ReservationCreatedResponse> ReserveAsync(ReservationRequest request, CancellationToken cancellationToken = default)
     {
         // 1. Fetch Room by roomId from providers (query all in parallel until found)
         var roomTasks = _providers.Select(p => p.GetRoomByIdAsync(request.RoomId, cancellationToken));
@@ -52,7 +52,7 @@ public class ReservationService : IReservationService
 
         // 4. Persist and return
         await _repository.AddAsync(reservation, cancellationToken);
-        return referenceNumber;
+        return new ReservationCreatedResponse { ReferenceNumber = referenceNumber };
     }
 
     public async Task<ReservationResponse> GetByReferenceAsync(string referenceNumber, CancellationToken cancellationToken = default)

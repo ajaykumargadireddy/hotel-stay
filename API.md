@@ -237,12 +237,12 @@ GET http://localhost:5263/hotels/reservation/RSV-20260708-ABC123
 
 Retrieve a list of all available countries.
 
-**Endpoint:** `GET /countries`
+**Endpoint:** `GET /lookups/countries`
 
 **Example Request:**
 
 ```bash
-GET http://localhost:5263/countries
+GET http://localhost:5263/lookups/countries
 ```
 
 **Example Response:** `200 OK`
@@ -278,7 +278,7 @@ GET http://localhost:5263/countries
 
 Retrieve a list of all cities, optionally filtered by country code.
 
-**Endpoint:** `GET /cities`
+**Endpoint:** `GET /lookups/cities`
 
 **Query Parameters:**
 
@@ -289,13 +289,13 @@ Retrieve a list of all cities, optionally filtered by country code.
 **Example Request (All Cities):**
 
 ```bash
-GET http://localhost:5263/cities
+GET http://localhost:5263/lookups/cities
 ```
 
 **Example Request (Cities by Country):**
 
 ```bash
-GET http://localhost:5263/cities?countryCode=IN
+GET http://localhost:5263/lookups/cities?countryCode=IN
 ```
 
 **Example Response:** `200 OK`

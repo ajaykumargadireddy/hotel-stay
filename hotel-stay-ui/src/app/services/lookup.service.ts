@@ -15,7 +15,7 @@ export class LookupService {
       return of(this.countriesCache);
     }
     return this.http
-      .get<Country[]>('/countries')
+      .get<Country[]>('/lookups/countries')
       .pipe(tap(countries => (this.countriesCache = countries)));
   }
 
@@ -32,7 +32,7 @@ export class LookupService {
     }
 
     return this.http
-      .get<City[]>('/cities', { params })
+      .get<City[]>('/lookups/cities', { params })
       .pipe(tap(cities => this.citiesCache.set(key, cities)));
   }
 }

@@ -6,12 +6,10 @@ The reservation lookup endpoint retrieves stored reservation details by referenc
 
 ### Requirements
 
-- **SHALL** accept reference number as URL path parameter in format `REF-{8-char-hex}`
+- **SHALL** accept reference number as URL path parameter (any string)
 - **SHALL** retrieve reservation from in-memory repository (ConcurrentDictionary)
 - **SHALL** return 200 OK with full reservation details when found
 - **SHALL** return 404 Not Found when reference number does not exist
-- **SHALL** validate reference number format (must match `REF-[a-f0-9]{8}`)
-- **SHALL** return 400 Bad Request when reference number format is invalid
 
 ### Response Schema (camelCase JSON — default .NET minimal API format)
 
@@ -102,34 +100,7 @@ The reservation lookup endpoint retrieves stored reservation details by referenc
 
 ---
 
-### Scenario 4: Invalid reference number format - missing prefix (400 Bad Request)
-
-**GIVEN** client provides reference number without "REF-" prefix  
-**WHEN** client sends GET `/hotels/reservation/3fa85f64`  
-**THEN** response status is 400 Bad Request  
-**AND** response body is ProblemDetails with `detail: "Invalid reference number format. Expected REF-{8-char-hex}"`  
-
----
-
-### Scenario 5: Invalid reference number format - wrong length (400 Bad Request)
-
-**GIVEN** client provides reference number with incorrect hex length  
-**WHEN** client sends GET `/hotels/reservation/REF-123`  
-**THEN** response status is 400 Bad Request  
-**AND** response body is ProblemDetails with `detail: "Invalid reference number format. Expected REF-{8-char-hex}"`  
-
----
-
-### Scenario 6: Invalid reference number format - non-hex characters (400 Bad Request)
-
-**GIVEN** client provides reference number with invalid characters  
-**WHEN** client sends GET `/hotels/reservation/REF-GGGGGGGG`  
-**THEN** response status is 400 Bad Request  
-**AND** response body is ProblemDetails with `detail: "Invalid reference number format. Expected REF-{8-char-hex}"`  
-
----
-
-### Scenario 7: Case-insensitive reference number lookup
+### Scenario 4: Case-insensitive reference number lookup
 
 **GIVEN** reservation exists with reference number `REF-3fa85f64`  
 **WHEN** client sends GET `/hotels/reservation/REF-3FA85F64` (uppercase hex)  
@@ -139,7 +110,7 @@ The reservation lookup endpoint retrieves stored reservation details by referenc
 
 ---
 
-### Scenario 8: Lookup immediately after reservation creation
+### Scenario 5: Lookup immediately after reservation creation
 
 **GIVEN** client just created reservation via POST `/hotels/reserve`  
 **AND** received `referenceNumber: "REF-3fa85f64"` in response  

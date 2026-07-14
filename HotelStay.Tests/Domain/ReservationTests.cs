@@ -204,6 +204,65 @@ public class ReservationTests
     }
 
     [Fact]
+    public void Reserve_WithEmptyDocumentHolderName_ShouldThrowDomainValidationException()
+    {
+        // Arrange
+        var room = CreateTestRoom();
+
+        // Act & Assert - empty string
+        var exception1 = Assert.Throws<DomainValidationException>(() =>
+        {
+            var doc = Document.Create("", DocumentType.Passport, "ABC123456");
+            Reservation.Reserve(
+                referenceNumber: "REF-" + Guid.NewGuid().ToString("N")[..8],
+                roomId: room.RoomId,
+                room: room,
+                checkIn: room.CheckIn,
+                checkOut: room.CheckOut,
+                document: doc,
+                reservationTimestamp: DateTime.Now);
+        });
+        Assert.Contains("document holder name", exception1.Message.ToLower());
+
+        // Act & Assert - whitespace only
+        var exception2 = Assert.Throws<DomainValidationException>(() =>
+        {
+            var doc = Document.Create("   ", DocumentType.Passport, "ABC123456");
+            Reservation.Reserve(
+                referenceNumber: "REF-" + Guid.NewGuid().ToString("N")[..8],
+                roomId: room.RoomId,
+                room: room,
+                checkIn: room.CheckIn,
+                checkOut: room.CheckOut,
+                document: doc,
+                reservationTimestamp: DateTime.Now);
+        });
+        Assert.Contains("document holder name", exception2.Message.ToLower());
+    }
+
+    [Fact]
+    public void Reserve_WithNullDocumentHolderName_ShouldThrowDomainValidationException()
+    {
+        // Arrange
+        var room = CreateTestRoom();
+
+        // Act & Assert
+        var exception = Assert.Throws<DomainValidationException>(() =>
+        {
+            var doc = Document.Create(null!, DocumentType.Passport, "ABC123456");
+            Reservation.Reserve(
+                referenceNumber: "REF-" + Guid.NewGuid().ToString("N")[..8],
+                roomId: room.RoomId,
+                room: room,
+                checkIn: room.CheckIn,
+                checkOut: room.CheckOut,
+                document: doc,
+                reservationTimestamp: DateTime.Now);
+        });
+        Assert.Contains("document holder name", exception.Message.ToLower());
+    }
+
+    [Fact]
     public void NumberOfNights_ShouldCalculateCorrectly()
     {
         // Arrange

@@ -18,7 +18,7 @@ public class Room
     public string[] Amenities { get; init; }
     public int? StarRating { get; init; }
 
-    private Room()
+    public Room()
     {
         Provider = string.Empty;
         Destination = string.Empty;

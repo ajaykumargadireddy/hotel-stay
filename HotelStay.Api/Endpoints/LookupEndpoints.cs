@@ -10,7 +10,7 @@ public static class LookupEndpoints
 {
     public static void MapLookupEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/countries", () =>
+        app.MapGet("/lookups/countries", () =>
         {
             return Results.Ok(Country.All);
         })
@@ -18,7 +18,7 @@ public static class LookupEndpoints
         .WithTags("Lookups")
         .Produces<Country[]>(StatusCodes.Status200OK);
 
-        app.MapGet("/cities", (string countryCode) =>
+        app.MapGet("/lookups/cities", (string? countryCode) =>
         {
             if (string.IsNullOrEmpty(countryCode))
             {

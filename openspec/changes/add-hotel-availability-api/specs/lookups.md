@@ -10,14 +10,17 @@ The lookup endpoints provide reference data for countries and cities, supporting
 
 - **SHALL** return list of all countries with `code` and `name` properties
 - **SHALL** return 200 OK with camelCase JSON array (default .NET minimal API format)
-- **SHALL** include 5 countries: India (IND), United Kingdom (GBR), United States (USA), France (FRA), Japan (JPN)
+- **SHALL** include 5 countries: India (IN), United Kingdom (GB), United States (US), France (FR), Japan (JP)
+- **SHALL** use ISO 3166-1 alpha-2 (2-letter) country codes
 
 #### Cities Endpoint
 
 - **SHALL** return list of all cities with `code`, `name`, and `countryCode` properties
 - **SHALL** return 200 OK with camelCase JSON array (default .NET minimal API format)
 - **SHALL** include cities from multiple countries: Mumbai (BOM), London (LON), New York (NYC), etc.
-- **SHALL** link cities to countries via `countryCode` field
+- **SHALL** link cities to countries via `countryCode` field (ISO 3166-1 alpha-2)
+- **SHALL** support optional `countryCode` query parameter for filtering cities by country
+- **SHALL** return all cities when no `countryCode` parameter is provided
 
 ### Response Schemas (camelCase JSON — default .NET minimal API format)
 
@@ -25,7 +28,7 @@ The lookup endpoints provide reference data for countries and cities, supporting
 ```json
 [
   {
-    "code": "string (ISO 3166-1 alpha-3, e.g., IND, GBR, USA)",
+    "code": "string (ISO 3166-1 alpha-2, e.g., IN, GB, US)",
     "name": "string (country name)"
   }
 ]
@@ -37,7 +40,7 @@ The lookup endpoints provide reference data for countries and cities, supporting
   {
     "code": "string (3-letter city code, e.g., BOM, LON, NYC)",
     "name": "string (city name)",
-    "countryCode": "string (ISO 3166-1 alpha-3)"
+    "countryCode": "string (ISO 3166-1 alpha-2)"
   }
 ]
 ```
@@ -57,29 +60,31 @@ The lookup endpoints provide reference data for countries and cities, supporting
 ```json
 [
   {
-    "code": "IND",
+    "code": "IN",
     "name": "India"
   },
   {
-    "code": "GBR",
+    "code": "GB",
     "name": "United Kingdom"
   },
   {
-    "code": "USA",
+    "code": "US",
     "name": "United States"
   },
   {
-    "code": "FRA",
+    "code": "FR",
     "name": "France"
   },
   {
-    "code": "JPN",
+    "code": "JP",
     "name": "Japan"
   }
 ]
 ```
 
 ---
+
+### Scenario 1b: Get all cities
 
 **GIVEN** system has cities from multiple countries configured  
 **WHEN** client sends GET `/lookups/cities`  
@@ -92,39 +97,69 @@ The lookup endpoints provide reference data for countries and cities, supporting
   {
     "code": "BOM",
     "name": "Mumbai",
-    "countryCode": "IND"
+    "countryCode": "IN"
   },
   {
     "code": "DEL",
     "name": "Delhi",
-    "countryCode": "IND"
+    "countryCode": "IN"
   },
   {
     "code": "LON",
     "name": "London",
-    "countryCode": "GBR"
+    "countryCode": "GB"
   },
   {
     "code": "NYC",
     "name": "New York",
-    "countryCode": "USA"
+    "countryCode": "US"
   },
   {
     "code": "PAR",
     "name": "Paris",
-    "countryCode": "FRA"
+    "countryCode": "FR"
   },
   {
     "code": "TYO",
     "name": "Tokyo",
-    "countryCode": "JPN"
+    "countryCode": "JP"
   }
 ]
 ```
 
 ---
 
-### Scenario 2: Frontend integration - City dropdown with country grouping
+### Scenario 2: Get cities filtered by country
+
+**GIVEN** system has cities from multiple countries configured  
+**WHEN** client sends GET `/lookups/cities?countryCode=IN`  
+**THEN** response status is 200 OK  
+**AND** response body contains only cities from India:
+
+**Example Response:**
+```json
+[
+  {
+    "code": "BOM",
+    "name": "Mumbai",
+    "countryCode": "IN"
+  },
+  {
+    "code": "DEL",
+    "name": "Delhi",
+    "countryCode": "IN"
+  },
+  {
+    "code": "BLR",
+    "name": "Bangalore",
+    "countryCode": "IN"
+  }
+]
+```
+
+---
+
+### Scenario 3: Frontend integration - City dropdown with country grouping
 
 **GIVEN** frontend fetches countries and cities on page load  
 **WHEN** client calls GET `/lookups/countries` and GET `/lookups/cities`  

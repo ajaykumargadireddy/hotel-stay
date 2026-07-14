@@ -42,6 +42,16 @@ public class Reservation
         {
             throw new DocumentMismatchException("International destinations require Passport");
         }
+        
+        if(document.HolderName == null || document.HolderName.Trim().Length == 0)
+        {
+            throw new DomainValidationException("Document holder name is required");
+        }
+
+        if(document.Number == null || document.Number.Trim().Length == 0)
+        {
+            throw new DomainValidationException("Document number is required");
+        }
 
         // Validate date range (check-out > check-in)
         if (checkOut <= checkIn)
@@ -57,12 +67,6 @@ public class Reservation
         if(!(checkOut >= room.CheckIn && checkOut <= room.CheckOut))
         {
             throw new DomainValidationException("Check-out date is outside the room's availability");
-        }
-
-        // Validate document not empty
-        if (string.IsNullOrWhiteSpace(document.Number))
-        {
-            throw new DomainValidationException("Document number is required");
         }
 
         return new Reservation

@@ -18,12 +18,12 @@ describe('LookupService', () => {
     service = TestBed.inject(LookupService);
   });
 
-  it('getCountries fetches from /countries', (done) => {
+  it('getCountries fetches from /lookups/countries', (done) => {
     httpSpy.get.and.returnValue(of([{ code: 'IN', name: 'India' }]));
 
     service.getCountries().subscribe(countries => {
       expect(countries.length).toBe(1);
-      expect(httpSpy.get).toHaveBeenCalledWith('/countries');
+      expect(httpSpy.get).toHaveBeenCalledWith('/lookups/countries');
       done();
     });
   });

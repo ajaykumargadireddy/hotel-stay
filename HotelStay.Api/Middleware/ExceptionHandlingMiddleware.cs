@@ -24,6 +24,11 @@ public sealed class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (BadHttpRequestException ex)
+        {
+            _logger.LogWarning(ex, "Bad request: {Message}", ex.Message);
+            await WriteProblemAsync(context, StatusCodes.Status400BadRequest, "Bad request", ex.Message);
+        }
         catch (DomainValidationException ex)
         {
             _logger.LogWarning(ex, "Domain validation failed: {Message}", ex.Message);

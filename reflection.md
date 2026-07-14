@@ -2,12 +2,33 @@
 
 ## Future Enhancements & Scope
 
-### 1. Integration Test Suite for End-to-End Coverage
-- Implement comprehensive integration tests using WebApplicationFactory
-- Test complete API workflows (search → reserve → lookup)
-- Add database integration tests with test containers (e.g., Testcontainers for PostgreSQL)
-- Test multi-provider scenarios and error handling flows
-- Validate HTTP response codes, headers, and ProblemDetails format
+### 1. ✅ Integration Test Suite for End-to-End Coverage (Completed)
+**Implemented in `HotelStay.Tests/Api/HotelWorkflowIntegrationTests.cs`**
+
+Comprehensive API integration tests using `WebApplicationFactory<Program>` covering:
+- ✅ Complete end-to-end workflows: Search → Reserve → Lookup
+- ✅ Multi-provider aggregation tests (PremierStays + BudgetNests)
+- ✅ Document validation scenarios (National ID for domestic, Passport for international)
+- ✅ HTTP response codes validation (200 OK, 201 Created, 400 Bad Request, 404 Not Found, 422 Unprocessable Entity)
+- ✅ ProblemDetails format validation for error responses
+- ✅ Room type filtering tests
+- ✅ Price calculation consistency verification
+- ✅ Invalid room ID and reference number error handling
+
+**Test Cases Implemented:**
+1. `CompleteWorkflow_SearchReserveLookup_DomesticWithNationalId_ShouldSucceed`
+2. `CompleteWorkflow_SearchReserveLookup_InternationalWithPassport_ShouldSucceed`
+3. `CompleteWorkflow_InternationalWithNationalId_ShouldReturn422`
+4. `CompleteWorkflow_MultipleProvidersAggregation_ShouldReturnCombinedResults`
+5. `CompleteWorkflow_ReservationLookupWithInvalidReference_ShouldReturn404`
+6. `CompleteWorkflow_ReserveWithInvalidRoomId_ShouldReturn400`
+7. `CompleteWorkflow_SearchWithRoomTypeFilter_ShouldReturnOnlyMatchingType`
+8. `CompleteWorkflow_SearchWithoutRoomTypeFilter_ShouldReturnAllTypes`
+9. `CompleteWorkflow_DomesticWithPassport_ShouldSucceed`
+10. `CompleteWorkflow_ReservationPriceCalculation_ShouldMatchSearchResults`
+
+**Remaining Future Enhancements:**
+- Add database integration tests with Testcontainers (when database persistence is implemented)
 - Test concurrent reservation scenarios and race conditions
 - Add Angular E2E tests using Cypress or Playwright
 - Measure and enforce code coverage thresholds (e.g., 80%+ coverage)
@@ -56,7 +77,7 @@
 ## Implementation Priority
 These enhancements can be prioritized based on business value and technical dependencies:
 1. Database persistence (foundational for other features)
-2. Integration test suite (quality assurance and confidence)
+2. AI Integration Test suite
 3. User management system (enables personalization)
 4. Booking list screen (immediate UX improvement)
 5. Document upload (compliance and verification)

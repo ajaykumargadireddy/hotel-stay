@@ -23,6 +23,27 @@ This project follows a **spec-driven approach** where all design rationale, arch
 - `/opsx:archive add-hotel-availability-api`
 - `/opsx:archive add-angular-ui`
 
+### Ad-hoc prompts (post-implementation, Copilot Chat)
+
+#### Integration tests
+- *"Add end-to-end integration tests using `WebApplicationFactory<Program>` covering the full Search → Reserve → Lookup workflow for both domestic and international scenarios"*  → produced `HotelWorkflowIntegrationTests.cs` with 10 test cases
+- *"Add a test case that verifies a domestic reservation with a National ID succeeds, and an international reservation with a National ID returns 422"*  → added `CompleteWorkflow_InternationalWithNationalId_ShouldReturn422` and `CompleteWorkflow_DomesticWithPassport_ShouldSucceed`
+- *"Add an integration test that verifies price calculation in the reservation response matches the search result for the same room"*  → added `CompleteWorkflow_ReservationPriceCalculation_ShouldMatchSearchResults`
+
+#### Backend unit test coverage
+- *"Add unit tests for `HotelSearchService` — verify it queries all providers in parallel and aggregates results, and returns an empty list when no providers match"*  → produced `HotelSearchServiceTests.cs`
+- *"Add unit tests for `BudgetNestsProvider` and `PremierStaysProvider` — test filtering by destination, room type, and date range using Theory data covering every supported city"*  → produced `BudgetNestsProviderTests.cs` and `PremierStaysProviderTests.cs`
+
+#### Angular UI component test coverage
+- *"Add unit tests for `ReservationFormComponent` — cover document type restrictions per destination type, form validation rules, emit behaviour on valid/invalid submit, and `ngOnChanges` forcing Passport when switching to international"*  → produced `reservation-form.component.spec.ts`
+- *"Add unit tests for `ConfirmationPageComponent` — cover the state-based fast path (navigation state), the API fallback path, 404 vs generic error distinction, and redirect when reference param is missing"*  → produced `confirmation-page.component.spec.ts`
+- *"Add unit tests for `BookingsPageComponent` — cover form validation (required, minlength), `onSearch` happy path and all error branches (404, API detail, generic), and loading/error state transitions"*  → produced `bookings-page.component.spec.ts`
+
+#### Review comment fixes
+- *"Review flagged a gap in stub/test data coverage — a specific scenario was not represented. Add the missing data entry so that edge case is exercised"*  → extended stub data to cover the missing scenario; existing tests confirmed unaffected
+- *"Review identified missing unit test coverage for a component/service. Scaffold tests covering the key behaviours and edge cases"*  → added unit tests covering happy path, error branches, and boundary conditions
+- *"Review pointed out an untested code path based on a specific condition or input combination. Add a targeted test case for that condition"*  → added test case reproducing the exact condition; verified it passes against the existing implementation
+
 ## Key Judgement Calls
 
 One line per material decision — rationale intentionally lives in the linked design document (single source of truth).

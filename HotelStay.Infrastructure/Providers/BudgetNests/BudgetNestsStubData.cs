@@ -266,6 +266,25 @@ public static class BudgetNestsStubData
             }
         },
         {
+            Guid.Parse("44444444-6666-6666-6666-666666666666"),
+            new BudgetNestsRoomEntry
+            {
+                room_id = Guid.Parse("44444444-6666-6666-6666-666666666666"),
+                provider = "BudgetNests",
+                destination = "BOM",
+                location = "India",
+                room_type = RoomType.Deluxe,
+                check_in = StubDates.IndiaCheckIn,
+                check_out = StubDates.IndiaCheckOut,
+                per_night_rate = 4500m,
+                currency = "INR",
+                cancellation_policy = "Flexible",
+                amenities = Array.Empty<string>(),
+                available = false,  // Unavailable domestic room to test filtering
+                star_rating = null
+            }
+        },
+        {
             Guid.Parse("55555555-5555-5555-5555-555555555555"),
             new BudgetNestsRoomEntry
             {

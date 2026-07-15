@@ -47,7 +47,7 @@ One line per material decision — rationale intentionally lives in the linked d
 | Hotel Availability API | [proposal.md](openspec/changes/add-hotel-availability-api/proposal.md) | [design.md](openspec/changes/add-hotel-availability-api/design.md) | [specs/](openspec/changes/add-hotel-availability-api/specs/) |
 | Angular Hotel Booking UI | [proposal.md](openspec/changes/add-angular-ui/proposal.md) | [design.md](openspec/changes/add-angular-ui/design.md) | [specs/](openspec/changes/add-angular-ui/specs/) |
 
-Future enhancements and honest reflection: [reflections.md](reflections.md).
+Future enhancements and honest reflection: [reflection.md](reflection.md).
 
 ---
 

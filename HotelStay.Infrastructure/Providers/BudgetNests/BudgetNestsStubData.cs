@@ -245,6 +245,63 @@ public static class BudgetNestsStubData
                 available = false,  // This room should be filtered out
                 star_rating = null
             }
+        },
+        {
+            Guid.Parse("44444444-5555-5555-5555-555555555555"),
+            new BudgetNestsRoomEntry
+            {
+                room_id = Guid.Parse("44444444-5555-5555-5555-555555555555"),
+                provider = "BudgetNests",
+                destination = "DEL",
+                location = "India",
+                room_type = RoomType.Deluxe,
+                check_in = StubDates.IndiaCheckIn,
+                check_out = StubDates.IndiaCheckOut,
+                per_night_rate = 3200m,
+                currency = "INR",
+                cancellation_policy = "Flexible",
+                amenities = Array.Empty<string>(),
+                available = false,
+                star_rating = null
+            }
+        },
+        {
+            Guid.Parse("55555555-5555-5555-5555-555555555555"),
+            new BudgetNestsRoomEntry
+            {
+                room_id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+                provider = "BudgetNests",
+                destination = "LON",
+                location = "United Kingdom",
+                room_type = RoomType.Standard,
+                check_in = StubDates.UkCheckIn,
+                check_out = StubDates.UkCheckOut,
+                per_night_rate = 78m,
+                currency = "GBP",
+                cancellation_policy = "Flexible",
+                amenities = Array.Empty<string>(),
+                available = false,
+                star_rating = null
+            }
+        },
+        {
+            Guid.Parse("66666666-5555-5555-5555-555555555555"),
+            new BudgetNestsRoomEntry
+            {
+                room_id = Guid.Parse("66666666-5555-5555-5555-555555555555"),
+                provider = "BudgetNests",
+                destination = "NYC",
+                location = "United States",
+                room_type = RoomType.Suite,
+                check_in = StubDates.UsCheckIn,
+                check_out = StubDates.UsCheckOut,
+                per_night_rate = 210m,
+                currency = "USD",
+                cancellation_policy = "Flexible",
+                amenities = Array.Empty<string>(),
+                available = false,
+                star_rating = null
+            }
         }
     };
 }

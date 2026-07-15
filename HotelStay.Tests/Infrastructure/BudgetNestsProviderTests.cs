@@ -11,6 +11,43 @@ namespace HotelStay.Tests.Infrastructure;
 
 public class BudgetNestsProviderTests
 {
+    public static TheoryData<string, string, DateTime, DateTime, int> DestinationLocationDateCountCases => new()
+    {
+        { "BOM", "India", StubDates.IndiaCheckIn, StubDates.IndiaCheckOut, 3 },
+        { "DEL", "India", StubDates.IndiaCheckIn, StubDates.IndiaCheckOut, 1 },
+        { "LON", "United Kingdom", StubDates.UkCheckIn, StubDates.UkCheckOut, 2 },
+        { "MAN", "United Kingdom", StubDates.UkCheckIn, StubDates.UkCheckOut, 1 },
+        { "NYC", "United States", StubDates.UsCheckIn, StubDates.UsCheckOut, 3 },
+        { "TYO", "Japan", StubDates.JapanCheckIn, StubDates.JapanCheckOut, 1 }
+    };
+
+    [Theory]
+    [MemberData(nameof(DestinationLocationDateCountCases))]
+    public async Task Search_ShouldReturnExpectedEntriesPerDestinationAndLocation(
+        string destination,
+        string expectedLocation,
+        DateTime checkIn,
+        DateTime checkOut,
+        int expectedCount)
+    {
+        // Arrange
+        var provider = new BudgetNestsProvider();
+        var request = new HotelSearchRequest
+        {
+            Destination = destination,
+            CheckIn = checkIn,
+            CheckOut = checkOut
+        };
+
+        // Act
+        var results = (await provider.SearchAsync(request)).ToList();
+
+        // Assert
+        Assert.Equal(expectedCount, results.Count);
+        Assert.All(results, room => Assert.Equal(destination, room.Destination, StringComparer.OrdinalIgnoreCase));
+        Assert.All(results, room => Assert.Equal(expectedLocation, room.Location));
+    }
+
     [Fact]
     public async Task Search_ShouldFilterByDestination_CaseInsensitive()
     {
